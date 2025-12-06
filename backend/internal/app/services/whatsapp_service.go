@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 	"strings"
 
@@ -176,27 +177,28 @@ func (s *whatsAppService) handleIncomingMessage(evt *events.Message) {
 		return
 	}
 
-	// Check user eligibility
 	ctx := context.Background()
-	eligible, err := s.userService.IsUserEligible(ctx, phone)
-	if err != nil {
-		log.Printf("[WhatsAppService] Failed to check user eligibility for %s: %v", phone, err)
-		return
-	}
-
-	if !eligible {
-		log.Printf("[WhatsAppService] User %s is not eligible, ignoring message", phone)
-		// Optionally send a response to unregistered users
-		//s.sendUnregisteredUserMessage(ctx, phone)
-		return
-	}
-
-	// Get user details
-	user, err := s.userService.GetUserByPhone(ctx, phone)
-	if err != nil {
-		log.Printf("[WhatsAppService] Failed to get user by phone %s: %v", phone, err)
-		return
-	}
+	// Check user eligibility
+	// TODO: Uncomment when you want spesific user AI Reply
+	//eligible, err := s.userService.IsUserEligible(ctx, phone)
+	//if err != nil {
+	//	log.Printf("[WhatsAppService] Failed to check user eligibility for %s: %v", phone, err)
+	//	return
+	//}
+	//
+	//if !eligible {
+	//	log.Printf("[WhatsAppService] User %s is not eligible, ignoring message", phone)
+	//	// Optionally send a response to unregistered users
+	//	//s.sendUnregisteredUserMessage(ctx, phone)
+	//	return
+	//}
+	//
+	//// Get user details
+	//user, err := s.userService.GetUserByPhone(ctx, phone)
+	//if err != nil {
+	//	log.Printf("[WhatsAppService] Failed to get user by phone %s: %v", phone, err)
+	//	return
+	//}
 
 	// Extract message text
 	messageText := s.extractMessageText(evt.Message)
@@ -205,18 +207,19 @@ func (s *whatsAppService) handleIncomingMessage(evt *events.Message) {
 		return
 	}
 
-	log.Printf("[WhatsAppService] Processing message from %s (%s): %s", user.Name, phone, messageText)
+	//log.Printf("[WhatsAppService] Processing message from %s (%s): %s", user.Name, phone, messageText)
 
 	// Create user context
 	userContext := &models.UserContext{
-		UserID: user.ID,
-		Name:   user.Name,
-		Phone:  user.Phone,
-		Email:  user.Email,
+		UserID: uuid.New(),
+		//Name:   user.Name,
+		Name:  "Dummy",
+		Phone: phone,
+		Email: "dummy@email.com",
 	}
 
 	// Route message to appropriate workflow
-	err = s.routeMessageToWorkflow(ctx, userContext, messageText)
+	err := s.routeMessageToWorkflow(ctx, userContext, messageText)
 	if err != nil {
 		log.Printf("[WhatsAppService] Failed to route message for user %s: %v", phone, err)
 		// Send error message to user
