@@ -76,7 +76,6 @@ coverage/
 *.h5
 *.pkl
 *.pickle
-models/
 checkpoints/
 /prompt/temp.txt
 
