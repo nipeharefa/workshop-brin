@@ -27,6 +27,9 @@ COPY . .
 RUN --mount=type=cache,target=/go/pkg/mod \
     go build -ldflags="-w -s" -trimpath -o build/go-service ./cmd/bot/main.go
 
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go build -ldflags="-w -s" -trimpath -o build/go-service-migrate ./cmd/migrate/main.go
+
 # Runtime stage
 FROM gcr.io/distroless/static-debian13:nonroot
 
@@ -34,6 +37,7 @@ WORKDIR /app
 
 # Copy the binary from builder stage
 COPY --from=builder /app/build/go-service /app/go-service
+COPY --from=builder /app/build/go-service-migrate /app/go-service-migrate
 COPY migrations migrations
 # Set non-root user
 USER nonroot:nonroot
