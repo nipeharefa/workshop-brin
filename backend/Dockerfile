@@ -34,7 +34,7 @@ WORKDIR /app
 
 # Copy the binary from builder stage
 COPY --from=builder /app/build/go-service /app/go-service
-
+COPY migrations migrations
 # Set non-root user
 USER nonroot:nonroot
 
